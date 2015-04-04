@@ -2,18 +2,33 @@
 
 set -e
 
+AWK_SCRIPTS="$_DOCKER_FORWARD_ROOT/libexec/awk-scripts"
 SELECTED_VM_FILE="$HOME/.docker-forward-vm"
 DEFAULT_VM_NAME="boot2docker-vm"
 
 get_selected_vm() {
-  if [[ -f $SELECTED_VM_FILE ]]; then
-    vm_name="$(cat "$SELECTED_VM_FILE")"
-    if [[ "$vm_name" == "" ]]; then
-      echo "$DEFAULT_VM_NAME"
-    else
-      echo "$vm_name"
-    fi
+  specified_vm_name="$1"
+  if [[ -n "$specified_vm_name" ]]; then
+    echo "$specified_vm_name"
   else
-    echo "$DEFAULT_VM_NAME"
+    if [[ -f $SELECTED_VM_FILE ]]; then
+      vm_name="$(cat "$SELECTED_VM_FILE")"
+      if [[ -n "$vm_name" ]]; then
+        echo "$vm_name"
+      else
+        echo "$DEFAULT_VM_NAME"
+      fi
+    else
+      echo "$DEFAULT_VM_NAME"
+    fi
   fi
+}
+
+list_vms() {
+  echo "$(VBoxManage list vms | gawk -f $AWK_SCRIPTS/list-vms)"
+}
+
+list_forwarded_ports() {
+  vm_name="$1"
+  echo "$(VBoxManage showvminfo $(get_selected_vm $vm_name) | gawk -f $AWK_SCRIPTS/get-ports)"
 }

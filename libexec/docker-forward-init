@@ -66,7 +66,7 @@ esac
 commands=(`docker-forward commands --sh`)
 IFS="|"
 cat <<EOS
-_docker-forward_wrapper() {
+docker-forward() {
   local command="\$1"
   if [ "\$#" -gt 0 ]; then
     shift
@@ -80,15 +80,3 @@ _docker-forward_wrapper() {
   esac
 }
 EOS
-
-# zsh can't pass argument with aliases, but bash can.
-# zsh can have functions with the name being only numbers, but bash can't.
-# fix both cases here by letting zsh have a function, and bash have its alias.
-case "$shell" in
-bash )
-  echo "alias docker-forward=_docker-forward_wrapper"
-  ;;
-zsh )
-  echo "docker-forward=_docker-forward_wrapper"
-  ;;
-esac

@@ -25,7 +25,11 @@ get_selected_vm() {
 }
 
 list_vms() {
-  echo "$(VBoxManage list vms | gawk -f $AWK_SCRIPTS/list-vms)"
+  for line in "$(VBoxManage list vms)"; do
+    while IFS=$' ' read -r vm id; do
+      echo "$vm" | tr -d '\"'
+    done <<< "$line"
+  done
 }
 
 list_forwarded_ports() {

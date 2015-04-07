@@ -5,8 +5,24 @@ set -e
 
 # Provide docker-forward completions
 if [[ "$1" == "--complete" ]]; then
-  echo -e "$(list_vms)"
-  exit 0
+  vm_list_completions
 fi
 
-list_forwarded_ports "$1" | gawk -f "$AWK_SCRIPTS/print-open-ports"
+tcp_ports=""
+udp_ports=""
+
+ports_info=$(list_forwarded_ports "$1")
+for port_info in "$ports_info"; do
+  while IFS="/" read -r protocol port ; do
+    if [[ $protocol == "tcp" ]]; then
+      tcp_ports="$tcp_ports$port "
+    else
+      if [[ $protocol == "udp" ]]; then
+        udp_ports="$udp_ports$port "
+      fi
+    fi
+  done <<< "$port_info"
+done
+
+echo "TCP ports: $tcp_ports"
+echo "UDP ports: $udp_ports"

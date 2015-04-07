@@ -5,8 +5,7 @@ set -e
 
 # Provide docker-forward completions
 if [[ "$1" == "--complete" ]]; then
-  echo -e "$(list_vms)"
-  exit 0
+  vm_list_completions
 fi
 
 update_vm_name() {

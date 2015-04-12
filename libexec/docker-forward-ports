@@ -3,15 +3,10 @@ set -e
 
 . $_DOCKER_FORWARD_ROOT/libexec/commons
 
-# Provide docker-forward completions
-if [[ "$1" == "--complete" ]]; then
-  vm_list_completions
-fi
-
 tcp_ports=""
 udp_ports=""
 
-ports_info=$(list_forwarded_ports "$1")
+ports_info=$(list_forwarded_ports)
 for port_info in "$ports_info"; do
   while IFS="/" read -r protocol port ; do
     if [[ $protocol == "tcp" ]]; then

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -e
+
+. $_DOCKER_FORWARD_ROOT/libexec/virtualbox
+
+docker-forward add-tcp $1
+docker-forward add-udp $1

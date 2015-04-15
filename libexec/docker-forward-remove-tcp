@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -e
+
+. $_DOCKER_FORWARD_ROOT/libexec/virtualbox
+
+remove_port "tcp" $1

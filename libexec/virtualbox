@@ -13,19 +13,36 @@ port_name() {
 }
 
 is_tcp() {
-  [[ "$1" == "TCP" ]]
+  [[ "$1" == "tcp" ]]
 }
 
 is_udp() {
- [[ "$2" == "UDP" ]]
+ [[ "$2" == "udp" ]]
 }
 
 add_port() {
-  VBoxManage controlvm "$(get_selected_vm)" natpf1 "$(port_name $1 $2),$1,,$2,,$2"
+  if is_forwarded "$1" "$2"; then
+    echo "${1^^} port $2 is already forwarded."
+    exit 1
+  else
+    VBoxManage controlvm $(get_selected_vm) natpf1 $(port_name $1 $2),$1,,$2,,$2
+    echo "${1^^} port $2 is now forwarded."
+  fi
 }
 
 remove_port() {
-  VBoxManage controlvm "$(get_selected_vm)" natpf1 delete "$(port_name $1 $2)"
+  if is_forwarded "$1" "$2"; then
+    if [[ $2 = 22 ]]; then
+      echo "Cannot remove port forwarding for port 22: it would break Docker."
+      exit 1
+    else
+      VBoxManage controlvm "$(get_selected_vm)" natpf1 delete "$(port_name $1 $2)"
+      echo "${1^^} port $2 is not forwarded anymore."
+    fi
+  else
+    echo "${1^^} port $2 is not forwarded."
+    exit 1
+  fi
 }
 
 list_vms() {
@@ -42,12 +59,12 @@ list_forwarded_ports() {
     if [[ "$line" =~ $RULES_REGEX ]]; then
       protocol=$(extract "$line" "$PROTOCOL_REGEX")
       port=$(extract "$line" "$PORT_REGEX")
-      echo "${protocol^^}/$port"
+      echo "$protocol/$port"
     fi
   done <<< "$vm_info"
 }
 
-is_port_forwarded() {
+is_forwarded() {
   is_forwarded=0
   while IFS=$'\n' read -r line ; do
     while IFS="/" read -r protocol port ; do
@@ -57,7 +74,7 @@ is_port_forwarded() {
       fi
     done <<< "$line"
   done <<< "$(list_forwarded_ports)"
-  echo "$is_forwarded"
+  [[ $is_forwarded == 1 ]]
 }
 
 vm_list_completions() {

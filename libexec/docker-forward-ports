@@ -1,22 +1,19 @@
 #!/usr/bin/env bash
 set -e
 
-. $_DOCKER_FORWARD_ROOT/libexec/commons
+. $_DOCKER_FORWARD_ROOT/libexec/utils
+. $_DOCKER_FORWARD_ROOT/libexec/virtualbox
 
 tcp_ports=""
 udp_ports=""
 
-sort_shorter_first() {
-  echo "$(echo "$1" | awk '{ print length, $0 }' | sort -n | cut -d" " -f 2 -)"
-}
-
 ports_info=$(sort_shorter_first "$(list_forwarded_ports)")
 for port_info in "$ports_info"; do
   while IFS="/" read -r protocol port ; do
-    if [[ $protocol == "tcp" ]]; then
+    if is_tcp $protocol; then
       tcp_ports="$tcp_ports$port "
     else
-      if [[ $protocol == "udp" ]]; then
+      if is_udp $protocol; then
         udp_ports="$udp_ports$port "
       fi
     fi

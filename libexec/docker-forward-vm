@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-. $_DOCKER_FORWARD_ROOT/libexec/commons
+. $_DOCKER_FORWARD_ROOT/libexec/utils
+. $_DOCKER_FORWARD_ROOT/libexec/virtualbox
 
 # Provide docker-forward completions
 if [[ "$1" == "--complete" ]]; then

@@ -4,21 +4,5 @@ set -e
 . $_DOCKER_FORWARD_ROOT/libexec/utils
 . $_DOCKER_FORWARD_ROOT/libexec/virtualbox
 
-tcp_ports=""
-udp_ports=""
-
-ports_info=$(sort_shorter_first "$(list_forwarded_ports)")
-for port_info in "$ports_info"; do
-  while IFS="/" read -r protocol port ; do
-    if is_tcp $protocol; then
-      tcp_ports="$tcp_ports$port "
-    else
-      if is_udp $protocol; then
-        udp_ports="$udp_ports$port "
-      fi
-    fi
-  done <<< "$port_info"
-done
-
-echo "TCP ports: $tcp_ports"
-echo "UDP ports: $udp_ports"
+echo "TCP ports: $(sort_shorter_first "$(list_forwarded_ports "tcp")" | tr "\n" " ")"
+echo "UDP ports: $(sort_shorter_first "$(list_forwarded_ports "udp")" | tr "\n" " ")"

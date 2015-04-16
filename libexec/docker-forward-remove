@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
+
 set -e
 
 . $_DOCKER_FORWARD_ROOT/libexec/virtualbox
+
+# Provide docker-forward completions
+if [[ "$1" == "--complete" ]]; then
+  sort_shorter_first "$(list_forwarded_ports)"
+  exit 0
+fi
 
 docker-forward remove-tcp $1
 docker-forward remove-udp $1
